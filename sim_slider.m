@@ -1,91 +1,39 @@
-%Valor de X y Y(cuantas flechas se dibujaran)
-[X,Y] = meshgrid(0.7:0.7,0:0.5:4); 
+% Campo con geometría variable.
 
-% odas las flechas están en la misma columna x = 0.7. 
-% Para que el campo llene el espacio entre placas necesitamos un rango, 
-% por ejemplo 0.7:0.5:5.5.
+% ---- INPUTS DEL USUARIO ----
+d = input('Separación entre placas (m): ');
+L = input('Altura de las placas (m): ');
+V_voltaje = input('Voltaje (V): ');
 
-% Componentes de un campo eléctrico uniforme.
+% ---- CAMPO ELÉCTRICO ----
+E = V_voltaje / d;
 
-% IMPORTANTE: Sobre 7.5 
-% El 7.5 es una constante arbitraria de magnitud.
-U = 7.5*X; % Componente X (U): horizontal, constante. Representa E apuntando de + hacia −
-V = 0*Y; Componente %Y (V): cero, porque el campo no tiene componente vertical en un capacitor ideal
+% ---- GRILLA DE FLECHAS ----
+% Llena el espacio entre placas en X, y la altura L en Y
+[X, Y] = meshgrid(linspace(0.5, d-0.5, 12), linspace(0, L, 50));
 
-% HACERLO UNIFORME de acuerdo a la teoría:
-% E_real = voltaje / d;          % física
-% E = E_real / max_E * flecha_max;  % normalizado para quiver
-% U = ones(size(X)) * E;   % E = voltaje / d
-% V = zeros(size(Y));
+hold on;
 
-
-% Los primeros 4 argumentos son origen (X,Y) y dirección (U,V). 
-% El 0 desactiva el autoescalado. 
-% sin él MATLAB normaliza todas las flechas a un tamaño similar, 
-% perdiendo la información de magnitud relativa.
-
-quiver(X,Y,U,V,0);
-
-% Se mantiene en el mismo grafico
-hold on; 
-
-% placas
-rectangle('Position', [0 -0.5 0.5 5] ,'Facecolor' , 'r'); 
-rectangle('Position', [6 -0.5 0.5 5] ,'Facecolor' , 'b'); 
-
-% Signos positivos de la placa izquierda 
-
-for y_pos = 0:0.5:4
-    % Se escribe texto en la posicion (0.25, Y). 'Y' va de 0 a 4 en paso de
-    % 0.5
-    text(0.25, y_pos, '+', 'FontSize',16, 'Color', 'white', 'HorizontalAlignment','center', 'FontWeight','bold'); 
-
-end 
+% ---- COMPONENTES DEL CAMPO (uniforme) ----
+U = ones(size(X)) * E;   % horizontal, constante en todo punto
+V = zeros(size(Y));      % sin componente vertical
 
 
-%Signos negativos de la placa derecha 
-for y_pos = 0:0.5:4
-    text(6.25, y_pos, '-', 'FontSize',16, 'Color', 'white', 'HorizontalAlignment','center', 'FontWeight','bold'); 
+% Placas
+rectangle('Position', [0,    -0.5, 0.5, L+1], 'FaceColor', 'r');
+rectangle('Position', [d,    -0.5, 0.5, L+1], 'FaceColor', 'b');
+
+% ---- GRAFICADO ----
+U_norm = ones(size(X));  % todas las flechas del mismo largo (normalizar)
+quiver(X, Y, U, V, 0.1); % último valor es de escala.
+
+% Signos sobre las placas
+for y_pos = 0:0.5:L
+    text(0.25, y_pos, '+', 'FontSize', 16, 'Color', 'white', ...
+        'HorizontalAlignment', 'center', 'FontWeight', 'bold');
+    text(d+0.25, y_pos, '-', 'FontSize', 16, 'Color', 'white', ...
+        'HorizontalAlignment', 'center', 'FontWeight', 'bold');
 end
 
-% Coloca un + cada 0.5 unidades a lo largo de la placa. 
-% El x=0.25 es el centro del ancho de la placa (0 a 0.5). 
-% El rango 0:0.5:4 debería coincidir con la altura de la placa.
-
-title('Campo electrico producido por dos electrodos con forma de placas planas');
-
-hold off; 
-
-% Libera el gráfico. 
-% Cualquier plot posterior lo reemplazaría en lugar de superponerse.
-
-% ----------- INTEGRAR SLIDER --------------- %
-% OPCION 1: UICONTROL
-function actualizar(src, ~)
-    d = src.Value;  % valor del slider
-    
-    cla;  % limpiar antes de redibujar
-    
-    E = voltaje / d;
-    [X, Y] = meshgrid(linspace(0.5, d-0.5, 8), 0:0.5:4);
-    U = ones(size(X)) * E;
-    V = zeros(size(Y));
-    
-    quiver(X, Y, U, V, 0);
-    hold on;
-    rectangle('Position', [0 -0.5 0.5 5], 'FaceColor', 'r');
-    rectangle('Position', [d -0.5 0.5 5], 'FaceColor', 'b');
-    % ... signos, title
-    hold off;
-end
-
-% OPCION 2: APP DESIGNER
-function SliderValueChanged(app, event)
-    d = app.Slider.Value;
-    
-    cla(app.UIAxes);
-    
-    E = app.Voltaje / d;
-    % ... mismo bloque de graficado pero sobre app.UIAxes
-    quiver(app.UIAxes, X, Y, U, V, 0);
-end
+title('Campo eléctrico entre placas paralelas');
+hold off;
