@@ -85,10 +85,9 @@ E_local(N) = E_local(N-1);
 a_x(N) = a_x(N-1);
 
 % ---- VISUALIZACIÓN 3D ----
-figure('Color', 'w', 'Position', [100, 100, 1400, 600]);
-
-% Subplot 1: Trayectoria en 2D con campo variable
-subplot(1, 2, 1); hold on;
+% Figure 1: Trayectoria 2D
+figure('Color', 'w', 'Position', [100, 100, 700, 600]);
+hold on;
 
 % Dibujar placas
 rectangle('Position', [0, 0, ancho_placa, L1], 'FaceColor', 'r', 'EdgeColor', 'none');
@@ -138,23 +137,26 @@ title(['Trayectoria: Campo variable (q=' num2str(q) ', m=' num2str(m) ')']);
 legend('Location', 'best');
 grid on; hold off;
 
-% Subplot 2: Campo local y aceleración vs posición X
-subplot(1, 2, 2); hold on;
+% Figure 2: Campo local y aceleración vs posición X
+figure('Color', 'w', 'Position', [850, 100, 700, 600]);
+hold on;
 
 yyaxis left
-plot(x, E_local, 'b-', 'LineWidth', 2);
-ylabel('Campo eléctrico E (V/m)', 'Color', 'b');
+plot(x, E_local, 'b-', 'LineWidth', 2.5);
+ylabel('Campo eléctrico E (V/m)', 'Color', 'b', 'FontSize', 12);
 ax = gca;
 ax.YAxis(1).Color = 'b';
+ax.YAxis(1).FontSize = 11;
 
 yyaxis right
-plot(x, a_x, 'r-', 'LineWidth', 2);
-ylabel('Aceleración a_x (m/s²)', 'Color', 'r');
+plot(x, a_x, 'r-', 'LineWidth', 2.5);
+ylabel('Aceleración a_x (m/s²)', 'Color', 'r', 'FontSize', 12);
 ax = gca;
 ax.YAxis(2).Color = 'r';
+ax.YAxis(2).FontSize = 11;
 
-xlabel('Posición X (m)');
-title('Campo y Aceleración a lo largo de la trayectoria');
+xlabel('Posición X (m)', 'FontSize', 12);
+title('Campo eléctrico y Aceleración a lo largo de la trayectoria', 'FontSize', 13);
 grid on; hold off;
 
 % ---- ESTADÍSTICAS ----
