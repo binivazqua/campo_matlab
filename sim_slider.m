@@ -41,18 +41,20 @@ rectangle('Position', [0,    -0.5, 0.5, L1+0.5], 'FaceColor', 'r');
 rectangle('Position', [d,    -0.5, 0.5, L2+0.5], 'FaceColor', 'b');
 
 % ---- GRAFICADO ----
-quiver(X, Y, U, V, 0.15);
+quiver(X, Y, U, V, 0.5);
 
-% Signos sobre placa izquierda
-for y_pos = 0:0.5:L1
-    text(0.25, y_pos, '+', 'FontSize', 16, 'Color', 'white', ...
-        'HorizontalAlignment', 'center', 'FontWeight', 'bold');
+% Signos sobre placa izquierda (evitar solapamiento)
+for y_pos = 0.25:1:L1
+    text(0.25, y_pos, '+', 'FontSize', 14, 'Color', 'white', ...
+        'HorizontalAlignment', 'center', 'VerticalAlignment', 'middle', ...
+        'FontWeight', 'bold');
 end
 
-% Signos sobre placa derecha
-for y_pos = 0:0.5:L2
-    text(d+0.25, y_pos, '-', 'FontSize', 16, 'Color', 'white', ...
-        'HorizontalAlignment', 'center', 'FontWeight', 'bold');
+% Signos sobre placa derecha (evitar solapamiento)
+for y_pos = 0.25:1:L2
+    text(d+0.25, y_pos, '−', 'FontSize', 14, 'Color', 'white', ...
+        'HorizontalAlignment', 'center', 'VerticalAlignment', 'middle', ...
+        'FontWeight', 'bold');
 end
 
 title('Campo eléctrico no uniforme (electrofóresis)');
