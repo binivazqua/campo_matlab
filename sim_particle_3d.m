@@ -1,13 +1,51 @@
 % Simulación 3D de partícula en campo eléctrico no uniforme
 % Combina el campo variable de sim_slider.m con la dinámica de sim_particle.m
 
-% ---- ENTRADAS DEL USUARIO ----
+% ---- SELECCIÓN DE PARÁMETROS ----
+fprintf('\n=== SIMULADOR DE ELECTROFÓRESIS 3D ===\n');
+fprintf('Presets de parámetros biológicos recomendados:\n');
+fprintf('1. DNA/RNA (carga típica de ácidos nucleicos)\n');
+fprintf('2. Proteína (carga típica de proteínas)\n');
+fprintf('3. Célula de sangre (glóbulo rojo)\n');
+fprintf('4. Parámetros personalizados\n\n');
+
+preset = input('Seleccionar preset (1-4): ');
+
+% Parámetros del campo eléctrico
 d = input('Separación entre placas (m): ');
 L1 = input('Altura de placa izquierda (m): ');
 L2 = input('Altura de placa derecha (m): ');
 V_voltaje = input('Voltaje (V): ');
-q = input('Carga de la partícula (C, ej. -1e-6): ');
-m = input('Masa de la partícula (kg, ej. 1e-9): ');
+
+% Parámetros de la partícula según preset
+switch preset
+    case 1
+        % DNA/RNA: carga muy negativa, masa muy pequeña
+        q = -1e-15;  % Coulombs (carga de una base de ADN)
+        m = 3.3e-26; % kg (peso molecular ~330 Da)
+        particula_nombre = 'ADN/ARN';
+        fprintf('\n>>> Preset: %s (q=%.2e C, m=%.2e kg)\n\n', particula_nombre, q, m);
+    case 2
+        % Proteína típica: carga negativa moderada, masa pequeña
+        q = -1e-18;  % Coulombs (carga típica de proteína pequeña)
+        m = 6.6e-23; % kg (peso molecular ~40 kDa)
+        particula_nombre = 'Proteína';
+        fprintf('\n>>> Preset: %s (q=%.2e C, m=%.2e kg)\n\n', particula_nombre, q, m);
+    case 3
+        % Célula de sangre: carga muy negativa, masa grande
+        q = -1e-12;  % Coulombs (glóbulo rojo típico)
+        m = 9e-14;   % kg (masa de GR ~90 picogramos)
+        particula_nombre = 'Glóbulo rojo';
+        fprintf('\n>>> Preset: %s (q=%.2e C, m=%.2e kg)\n\n', particula_nombre, q, m);
+    case 4
+        % Parámetros personalizados
+        q = input('Carga de la partícula (C, ej. -1e-15): ');
+        m = input('Masa de la partícula (kg, ej. 3.3e-26): ');
+        particula_nombre = 'Personalizado';
+        fprintf('\n>>> Parámetros personalizados (q=%.2e C, m=%.2e kg)\n\n', q, m);
+    otherwise
+        error('Opción inválida. Seleccione 1-4.');
+end
 
 % ---- CONFIGURACIÓN ----
 L_max = max(L1, L2);
@@ -85,8 +123,8 @@ E_local(N) = E_local(N-1);
 a_x(N) = a_x(N-1);
 
 % ---- VISUALIZACIÓN 3D ----
-% Figure 1: Trayectoria 2D
-figure('Color', 'w', 'Position', [100, 100, 700, 600]);
+% Figure 1: Trayectoria 2D - SIMULACIÓN DE PARTÍCULA
+figure('Color', 'w', 'Position', [100, 100, 750, 650]);
 hold on;
 
 % Dibujar placas
@@ -127,45 +165,67 @@ for i = 1:(length(t)-1)
 end
 
 % Posición inicial y final
-plot(x(1), y(1), 'go', 'MarkerFaceColor', 'g', 'MarkerSize', 8, 'DisplayName', 'Inicio');
-plot(x(end), y(end), 'r*', 'MarkerSize', 15, 'DisplayName', 'Final');
+plot(x(1), y(1), 'go', 'MarkerFaceColor', 'g', 'MarkerSize', 10, 'DisplayName', 'Inicio', 'LineWidth', 2);
+plot(x(end), y(end), 'r*', 'MarkerSize', 18, 'DisplayName', 'Final', 'LineWidth', 2);
 
 axis equal;
 axis([−1, d+1.5, −0.5, L_max+0.5]);
-xlabel('Posición X (m)'); ylabel('Altura Y (m)');
-title(['Trayectoria: Campo variable (q=' num2str(q) ', m=' num2str(m) ')']);
-legend('Location', 'best');
+xlabel('Posición X (m)', 'FontSize', 11); ylabel('Altura Y (m)', 'FontSize', 11);
+title(sprintf('Trayectoria de %s en Campo No Uniforme', particula_nombre), 'FontSize', 12, 'FontWeight', 'bold');
+legend('Location', 'best', 'FontSize', 10);
 grid on; hold off;
 
-% Figure 2: Campo local y aceleración vs posición X
-figure('Color', 'w', 'Position', [850, 100, 700, 600]);
+% Figure 2: Campo local y aceleración vs posición X - ANÁLISIS CINEMÁTICO INDEPENDIENTE
+figure('Color', 'w', 'Position', [900, 100, 750, 650]);
 hold on;
 
 yyaxis left
-plot(x, E_local, 'b-', 'LineWidth', 2.5);
-ylabel('Campo eléctrico E (V/m)', 'Color', 'b', 'FontSize', 12);
+plot(x, E_local, 'b-', 'LineWidth', 2.5, 'DisplayName', 'Campo E');
+ylabel('Campo eléctrico E (V/m)', 'Color', 'b', 'FontSize', 11);
 ax = gca;
 ax.YAxis(1).Color = 'b';
-ax.YAxis(1).FontSize = 11;
+ax.YAxis(1).FontSize = 10;
 
 yyaxis right
-plot(x, a_x, 'r-', 'LineWidth', 2.5);
-ylabel('Aceleración a_x (m/s²)', 'Color', 'r', 'FontSize', 12);
+plot(x, a_x, 'r-', 'LineWidth', 2.5, 'DisplayName', 'Aceleración a_x');
+ylabel('Aceleración a_x (m/s²)', 'Color', 'r', 'FontSize', 11);
 ax = gca;
 ax.YAxis(2).Color = 'r';
-ax.YAxis(2).FontSize = 11;
+ax.YAxis(2).FontSize = 10;
 
-xlabel('Posición X (m)', 'FontSize', 12);
-title('Campo eléctrico y Aceleración a lo largo de la trayectoria', 'FontSize', 13);
-grid on; hold off;
+xlabel('Posición X (m)', 'FontSize', 11);
+title(sprintf('Análisis Cinemático: Campo y Aceleración (%s)', particula_nombre), 'FontSize', 12, 'FontWeight', 'bold');
+grid on;
+hold off;
 
 % ---- ESTADÍSTICAS ----
-fprintf('\n=== RESULTADOS DE SIMULACIÓN 3D ===\n');
-fprintf('Posición inicial: (%.4f, %.4f)\n', x(1), y(1));
-fprintf('Posición final: (%.4f, %.4f)\n', x(end), y(end));
-fprintf('Distancia recorrida: %.4f m\n', sqrt((x(end)-x(1))^2 + (y(end)-y(1))^2));
-fprintf('Velocidad final X: %.6f m/s\n', vx(end));
-fprintf('Velocidad final Y: %.6f m/s\n', vy(end));
-fprintf('Campo máximo: %.4f V/m\n', max(E_local));
-fprintf('Aceleración máxima: %.6f m/s²\n', max(abs(a_x)));
-fprintf('\n');
+fprintf('\n╔════════════════════════════════════════════════════════════╗\n');
+fprintf('║       RESULTADOS DE SIMULACIÓN 3D - ELECTROFÓRESIS        ║\n');
+fprintf('╚════════════════════════════════════════════════════════════╝\n\n');
+fprintf('PARTÍCULA: %s\n', upper(particula_nombre));
+fprintf('├─ Carga (q): %.3e C\n', q);
+fprintf('├─ Masa (m): %.3e kg\n', m);
+fprintf('└─ Relación q/m: %.3e C/kg\n\n', q/m);
+
+fprintf('CAMPO Y PARÁMETROS:\n');
+fprintf('├─ Separación placas: %.4f m\n', d);
+fprintf('├─ Altura placa izquierda (L1): %.4f m\n', L1);
+fprintf('├─ Altura placa derecha (L2): %.4f m\n', L2);
+fprintf('├─ Voltaje aplicado: %.2f V\n', V_voltaje);
+fprintf('└─ Campo máximo: %.4f V/m\n\n', max(E_local));
+
+fprintf('TRAYECTORIA:\n');
+fprintf('├─ Posición inicial: (%.4f, %.4f) m\n', x(1), y(1));
+fprintf('├─ Posición final: (%.4f, %.4f) m\n', x(end), y(end));
+fprintf('├─ Desplazamiento X: %.4f m\n', x(end)-x(1));
+fprintf('├─ Desplazamiento Y: %.4f m\n', y(end)-y(1));
+fprintf('└─ Distancia total: %.4f m\n\n', sqrt((x(end)-x(1))^2 + (y(end)-y(1))^2));
+
+fprintf('DINÁMICA:\n');
+fprintf('├─ Velocidad final X: %.6f m/s\n', vx(end));
+fprintf('├─ Velocidad final Y: %.6f m/s\n', vy(end));
+fprintf('├─ Velocidad total: %.6f m/s\n', sqrt(vx(end)^2 + vy(end)^2));
+fprintf('├─ Aceleración máxima: %.6f m/s²\n', max(abs(a_x)));
+fprintf('└─ Tiempo de simulación: %.4f s\n\n', t_max);
+
+fprintf('═════════════════════════════════════════════════════════════\n\n');
