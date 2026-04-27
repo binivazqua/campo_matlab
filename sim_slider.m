@@ -24,8 +24,7 @@ rectangle('Position', [0,    -0.5, 0.5, L+1], 'FaceColor', 'r');
 rectangle('Position', [d,    -0.5, 0.5, L+1], 'FaceColor', 'b');
 
 % ---- GRAFICADO ----
-U_norm = ones(size(X));  % todas las flechas del mismo largo (normalizar)
-quiver(X, Y, U, V, 0.1); % último valor es de escala.
+quiver(X, Y, U, V, 0.1);
 
 % Signos sobre las placas
 for y_pos = 0:0.5:L
