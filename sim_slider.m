@@ -43,16 +43,19 @@ rectangle('Position', [d,    -0.5, 0.5, L2+0.5], 'FaceColor', 'b');
 % ---- GRAFICADO ----
 quiver(X, Y, U, V, 0.5);
 
-% Signos sobre placa izquierda (evitar solapamiento)
-for y_pos = 0.25:1:L1
-    text(0.25, y_pos, '+', 'FontSize', 14, 'Color', 'white', ...
+% Espaciado adaptativo para signos (evitar solapamiento)
+sign_spacing = max(L_max / 6, 0.5);  % Al menos 6 signos o espaciado mínimo de 0.5
+
+% Signos sobre placa izquierda
+for y_pos = sign_spacing/2:sign_spacing:L1
+    text(0.25, y_pos, '+', 'FontSize', 12, 'Color', 'white', ...
         'HorizontalAlignment', 'center', 'VerticalAlignment', 'middle', ...
         'FontWeight', 'bold');
 end
 
-% Signos sobre placa derecha (evitar solapamiento)
-for y_pos = 0.25:1:L2
-    text(d+0.25, y_pos, '−', 'FontSize', 14, 'Color', 'white', ...
+% Signos sobre placa derecha
+for y_pos = sign_spacing/2:sign_spacing:L2
+    text(d+0.25, y_pos, '−', 'FontSize', 12, 'Color', 'white', ...
         'HorizontalAlignment', 'center', 'VerticalAlignment', 'middle', ...
         'FontWeight', 'bold');
 end
